@@ -2,24 +2,24 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>I Love You</title>
+  <!-- ESTA LÍNEA ES VITAL PARA CELULARES -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>I Love You - Centrado</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    /* Reset básico para pantalla completa sin bordes */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
       background-color: black;
-      display: flex;
+      display: flex; /* Centrado avanzado con Flexbox */
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
+      min-height: 100vh; /* Ocupa todo el alto de la pantalla */
+      overflow: hidden; /* Evita barras de desplazamiento */
     }
+
     canvas {
-      display: block;
+      display: block; /* Quita espacios fantasmas inferiores */
     }
   </style>
 </head>
@@ -30,48 +30,59 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
+    // Función para ajustar el lienzo al tamaño real de la ventana
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
+    
+    // Ejecutar al cargar y al rotar el celular
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // Configuración del estilo del texto (centrado interno)
     ctx.fillStyle = '#ffb6c1';
-    ctx.font = 'bold 9px Arial';
+    ctx.font = 'bold 10px Arial'; // Un poco más grande para legibilidad móvil
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.textBaseline = 'middle'; // Centrado vertical del texto en su coordenada
 
     let scaleStep = 11;
     let i = 0;
 
     function drawNext() {
+      // Obtenemos el tamaño actual en cada frame por si cambió
       const width = canvas.width;
       const height = canvas.height;
       
-      // Escala dinámica según el tamaño de la pantalla
-      const baseScale = Math.min(width, height) / 45;
+      // Escala dinámica: El corazón se adapta al tamaño de la pantalla
+      // Usamos Math.min para que no se corte en pantallas verticales
+      const baseScale = Math.min(width, height) / 40;
       const currentScale = (scaleStep / 14) * baseScale;
 
       if (scaleStep < 17) {
         const angle = i * (Math.PI * 2) / 120;
         
-        // Ecuación paramétrica de la cardioide
-        const x = 16 * Math.pow(Math.sin(angle), 3) * currentScale;
-        const y = (13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * currentScale;
+        // --- MATEMÁTICA CORREGIDA PARA WEB ---
+        const xPosTurtle = 16 * Math.pow(Math.sin(angle), 3);
+        const yPosTurtle = (13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle));
 
-        // Se resta 'y' para invertir la orientación vertical del lienzo HTML
-        ctx.fillText("I love you", width / 2 + x, height / 2 - y);
+        // Invertimos la Y de Turtle (-yPosTurtle) y sumamos height/2 para centrar
+        const finalX = width / 2 + (xPosTurtle * currentScale);
+        const finalY = height / 2 - (yPosTurtle * currentScale);
+
+        ctx.fillText("I love you", finalX, finalY);
 
         i++;
         if (i >= 120) {
           i = 0;
           scaleStep++;
         }
+        // Animación suave
         requestAnimationFrame(drawNext);
       }
     }
 
+    // Iniciar animación
     drawNext();
   </script>
 </body>
