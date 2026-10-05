@@ -5,14 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I Love You</title>
   <style>
-    body {
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
       background-color: black;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+    }
+    canvas {
+      display: block;
     }
   </style>
 </head>
@@ -23,93 +30,43 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
     ctx.fillStyle = '#ffb6c1';
-    ctx.font = 'bold 10px Arial';
+    ctx.font = 'bold 9px Arial';
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-    const width = canvas.width;
-    const height = canvas.height;
-
-    let scale = 11;
+    let scaleStep = 11;
     let i = 0;
 
     function drawNext() {
-      if (scale < 17) {
+      const width = canvas.width;
+      const height = canvas.height;
+      
+      // Escala dinámica según el tamaño de la pantalla
+      const baseScale = Math.min(width, height) / 45;
+      const currentScale = (scaleStep / 14) * baseScale;
+
+      if (scaleStep < 17) {
         const angle = i * (Math.PI * 2) / 120;
         
-        // Ecuación paramétrica del corazón
-        const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
-        const y = (13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * scale;
+        // Ecuación paramétrica de la cardioide
+        const x = 16 * Math.pow(Math.sin(angle), 3) * currentScale;
+        const y = (13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * currentScale;
 
+        // Se resta 'y' para invertir la orientación vertical del lienzo HTML
         ctx.fillText("I love you", width / 2 + x, height / 2 - y);
 
         i++;
         if (i >= 120) {
           i = 0;
-          scale++;
-        }
-        requestAnimationFrame(drawNext);
-      }
-    }
-
-    drawNext();
-  </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>I Love You</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="canvas"></canvas>
-
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    ctx.fillStyle = '#ffb6c1';
-    ctx.font = 'bold 10px Arial';
-    ctx.textAlign = 'center';
-
-    const width = canvas.width;
-    const height = canvas.height;
-
-    let scale = 11;
-    let i = 0;
-
-    function drawNext() {
-      if (scale < 17) {
-        const angle = i * (Math.PI * 2) / 120;
-        
-        // Ecuación paramétrica del corazón
-        const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
-        const y = (13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * scale;
-
-        ctx.fillText("I love you", width / 2 + x, height / 2 - y);
-
-        i++;
-        if (i >= 120) {
-          i = 0;
-          scale++;
+          scaleStep++;
         }
         requestAnimationFrame(drawNext);
       }
